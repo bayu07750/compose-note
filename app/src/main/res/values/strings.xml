@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Compose Note</string>
+
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="empty">No data. try adding one</string>
+</resources>
