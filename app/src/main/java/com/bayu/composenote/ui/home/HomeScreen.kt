@@ -20,8 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
-import androidx.compose.material.icons.rounded.ArrowDropUp
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.NoteAdd
 import androidx.compose.material3.Card
@@ -38,11 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -100,6 +94,7 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetScaffold(
     uiState: HomeUiState,
@@ -190,8 +185,6 @@ fun Notes(
             NoteItem(
                 name = note.title,
                 description = note.description,
-                dateStart = note.formattedDateStart(),
-                dateEnd = note.formattedDateEnd(),
                 onClickItem = {
                     onNoteClicked(note)
                 },
@@ -206,19 +199,15 @@ fun Notes(
 fun NoteItem(
     name: String,
     description: String,
-    dateStart: String,
-    dateEnd: String,
     onClickItem: JCallback,
     modifier: Modifier = Modifier,
 ) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
     Card(
         onClick = onClickItem
     ) {
         Column(
             modifier = Modifier
-                .padding(all = 16.dp)
+                .padding(all = 24.dp)
                 .then(modifier)
                 .animateContentSize(
                     animationSpec = spring(
@@ -240,25 +229,13 @@ fun NoteItem(
                         .weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        imageVector = if (expanded) Icons.Rounded.ArrowDropUp else Icons.Rounded.ArrowDropDown,
-                        contentDescription = stringResource(id = if (expanded) R.string.expand else R.string.collapse)
-                    )
-                }
             }
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = if (expanded) Int.MAX_VALUE else 1,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            if (expanded) {
-                NoteDateItem(
-                    dateStart, dateEnd,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
         }
     }
 }
@@ -311,8 +288,6 @@ fun PreviewNoteItem() {
         NoteItem(
             name = "Testing",
             description = "Testing",
-            dateStart = "12 Mei 2022",
-            dateEnd = "12 Mei 2022",
             onClickItem = {},
             modifier = Modifier.fillMaxWidth()
         )
