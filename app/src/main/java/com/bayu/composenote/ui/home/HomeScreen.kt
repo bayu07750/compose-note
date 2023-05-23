@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bayu.composenote.R
 import com.bayu.composenote.model.Note
+import com.bayu.composenote.ui.LocalWindowSizeClass
 import com.bayu.composenote.ui.theme.ComposeNoteTheme
 import com.bayu.jctypealias.JCallback
 import com.bayu.jctypealias.JCallbackType
@@ -273,9 +275,10 @@ fun DateItem(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
     ) {
+        val shouldOnePanel = LocalWindowSizeClass.current == WindowWidthSizeClass.Compact
         Text(
             text = date,
-            style = MaterialTheme.typography.labelSmall,
+            style = if (shouldOnePanel) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
             modifier = Modifier.padding(all = 4.dp)
         )
     }
