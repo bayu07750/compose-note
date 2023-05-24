@@ -31,13 +31,19 @@ class AddNoteViewModel @Inject constructor(
         viewModelScope.launch {
             val noteId = savedStateHandle.get<Int>("id") ?: -1
             if (noteId != -1) {
-                val note = noteRepository.getNoteById(noteId)
-                _uiState.update { it.copy(note = note) }
+                getNoteById(noteId)
             }
         }
     }
 
-    fun addNote(title: String, description: String, startDate: String, endDate: String) {
+    fun getNoteById(id: Int) {
+        viewModelScope.launch {
+            val note = noteRepository.getNoteById(id)
+            _uiState.update { it.copy(note = note) }
+        }
+    }
+
+    fun addNote(title: String, description: String, startDate: String, endDate: String, updateState: Boolean = true) {
         viewModelScope.launch {
             val id = _uiState.value.note?.id
             noteRepository.addUpdateNote(
@@ -51,7 +57,11 @@ class AddNoteViewModel @Inject constructor(
                 )
             )
 
-            _uiState.update { it.copy(added = true) }
+            if (updateState) {
+                _uiState.update { it.copy(added = true) }
+            } else {
+                _uiState.update { it.copy(note = null, added = false) }
+            }
         }
     }
 }

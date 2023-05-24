@@ -50,18 +50,10 @@ fun AddNoteScreen(
     onAddNote: JCallbackType4<String, String, String, String>,
     modifier: Modifier = Modifier,
 ) {
-    var title by remember(state) { mutableStateOf(state.note?.title.orEmpty()) }
-    var description by remember(state) { mutableStateOf(state.note?.description.orEmpty()) }
-    var startDate by remember(state) { mutableStateOf(state.note?.formattedDateStart().orEmpty()) }
-    var endDate by remember(state) { mutableStateOf(state.note?.formattedDateEnd().orEmpty()) }
-    val allowAddNote by remember {
-        derivedStateOf {
-            title.isNotEmpty() && description.isNotEmpty() && startDate.isNotEmpty() && endDate.isNotEmpty()
-        }
-    }
+    val addNoteState = rememberAddNoteState(uiState = state)
 
     if (state.added) {
-        LaunchedEffect(true) {
+        LaunchedEffect(Unit) {
             onBack()
         }
     }
@@ -75,8 +67,13 @@ fun AddNoteScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        onAddNote(title, description, startDate, endDate)
-                    }, enabled = allowAddNote) {
+                        onAddNote(
+                            addNoteState.title,
+                            addNoteState.description,
+                            addNoteState.startDate,
+                            addNoteState.endDate
+                        )
+                    }, enabled = addNoteState.allowAddNote) {
                         Icon(imageVector = Icons.Rounded.Check, contentDescription = "Add note")
                     }
                 },
@@ -88,46 +85,35 @@ fun AddNoteScreen(
             )
         }
     ) { innerPadding ->
-        AddNoteContent(modifier = Modifier.padding(innerPadding),
-            title = title,
-            onTitleChange = { title = it },
-            description = description,
-            onDescriptionChange = { description = it },
-            startDate = startDate,
-            onStartDateChange = { startDate = it },
-            endDate = endDate,
-            onEndDateChange = { endDate = it })
+        AddNoteContent(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            addNoteState = addNoteState
+        )
     }
 }
 
 @Composable
 fun AddNoteContent(
-    title: String,
-    onTitleChange: JCallbackString,
-    description: String,
-    onDescriptionChange: JCallbackString,
-    startDate: String,
-    onStartDateChange: JCallbackString,
-    endDate: String,
-    onEndDateChange: JCallbackString,
     modifier: Modifier = Modifier,
+    addNoteState: AddNoteState = rememberAddNoteState(null)
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
             .padding(all = 16.dp),
     ) {
         OutlinedTextField(
-            value = title,
-            onValueChange = onTitleChange,
+            value = addNoteState.title,
+            onValueChange = { addNoteState.title = it },
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(text = "Title")
             }
         )
         OutlinedTextField(
-            value = description,
-            onValueChange = onDescriptionChange,
+            value = addNoteState.description,
+            onValueChange = { addNoteState.description = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp),
@@ -139,15 +125,15 @@ fun AddNoteContent(
         Row {
             SelectedDateButton(
                 label = "Select start date",
-                date = startDate,
-                onSelectedDate = onStartDateChange,
+                date = addNoteState.startDate,
+                onSelectedDate = { addNoteState.startDate = it },
                 modifier = Modifier.weight(1f),
             )
             Spacer(modifier = Modifier.width(16.dp))
             SelectedDateButton(
                 label = "Select end date",
-                date = endDate,
-                onSelectedDate = onEndDateChange,
+                date = addNoteState.endDate,
+                onSelectedDate = { addNoteState.endDate = it },
                 modifier = Modifier.weight(1f),
             )
         }
